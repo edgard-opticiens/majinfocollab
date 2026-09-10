@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mettre à jour mes informations — Groupe Edgard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F0E6;--ink:#1C1710;--muted:#78705F;--line:#E4DCC8;--surface:#FFFFFF;
+    --accent:#A97A2E;--accent-soft:rgba(169,122,46,.09);--accent-line:rgba(169,122,46,.3);
+    --ok:#2E7D4F;--danger:#8A2B1F;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:44px 24px 90px}
+  .eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+  h1{font-family:'Fraunces';font-size:1.9rem;font-weight:600;font-style:italic;margin:0 0 8px;letter-spacing:-.01em}
+  .subtitle{color:var(--muted);font-size:.94rem;line-height:1.55;max-width:600px;margin:0 0 30px}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:30px 28px;margin-bottom:20px;box-shadow:0 1px 2px rgba(0,0,0,.02),0 14px 34px -26px rgba(0,0,0,.15)}
+  .card h2{font-family:'Fraunces';font-size:1.15rem;font-weight:600;margin:0 0 16px}
+
+  label{display:block;font-size:.82rem;font-weight:600;color:var(--ink);margin:0 0 6px}
+  .hint{font-size:.78rem;color:var(--muted);margin:-2px 0 8px;line-height:1.4}
+  input[type=text],input[type=email],input[type=tel],select,textarea{
+    width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;font-size:.92rem;
+    font-family:inherit;background:#FCFBF7;color:var(--ink);margin-bottom:16px
+  }
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  textarea{resize:vertical;min-height:70px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:560px){.row2{grid-template-columns:1fr}}
+
+  .cat-toggle{display:flex;align-items:flex-start;gap:12px;padding:16px 0;border-top:1px solid var(--line);cursor:pointer;user-select:none}
+  .cat-toggle:first-of-type{border-top:none}
+  .cat-toggle input[type=checkbox]{margin:3px 0 0;width:18px;height:18px;accent-color:var(--accent);flex:none}
+  .cat-toggle .txt strong{display:block;font-size:.95rem;margin-bottom:2px}
+  .cat-toggle .txt span{font-size:.8rem;color:var(--muted);line-height:1.4}
+  .cat-body{display:none;padding:4px 0 18px 30px;border-top:none}
+  .cat-body.show{display:block}
+
+  .filebox{border:1.5px dashed var(--line);border-radius:10px;padding:16px;text-align:center;background:#FCFBF7;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
+  .filebox:hover{border-color:var(--accent)}
+  .filebox.has-file{border-style:solid;border-color:var(--ok);background:rgba(46,125,79,.05)}
+  .filebox input[type=file]{display:none}
+  .filebox .fb-label{font-size:.84rem;color:var(--muted)}
+  .filebox.has-file .fb-label{color:var(--ok);font-weight:600}
+  .filebox .fb-sub{font-size:.72rem;color:var(--muted);margin-top:3px}
+  .required-tag{color:var(--danger);font-weight:700}
+  .radio-group{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+  .radio-opt{display:flex;align-items:center;gap:9px;font-size:.9rem}
+  .radio-opt input{accent-color:var(--accent);width:16px;height:16px}
+
+  .submit-bar{position:sticky;bottom:16px;margin-top:8px}
+  .btn{width:100%;padding:15px;border:none;border-radius:12px;background:var(--ink);color:#fff;font-weight:700;font-size:.95rem;cursor:pointer;box-shadow:0 14px 30px -14px rgba(0,0,0,.35)}
+  .btn:disabled{opacity:.55;cursor:default}
+  .err{color:var(--danger);font-size:.82rem;margin-top:10px;display:none}
+  .okbox{display:none;text-align:center;padding:50px 24px}
+  .okbox h2{font-family:'Fraunces';font-size:1.5rem;margin:0 0 10px}
+  .okbox p{color:var(--muted);font-size:.94rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Groupe Edgard · Ressources Humaines</p>
+  <h1>Mettre à jour mes informations</h1>
+  <p class="subtitle">Signalez un changement (adresse, RIB, situation familiale…) directement au service RH, avec vos justificatifs si besoin. Vous pouvez cocher plusieurs catégories en même temps.</p>
+
+  <form id="frm">
+    <div class="card">
+      <h2>Qui êtes-vous ?</h2>
+      <div class="row2">
+        <div><label>Nom</label><input type="text" id="nom" required></div>
+        <div><label>Prénom</label><input type="text" id="prenom" required></div>
+      </div>
+      <label>Magasin / société</label>
+      <select id="societe" required>
+        <option value="">— Choisir —</option>
+        <optgroup label="Edgard Opticiens">
+          <option>Ango</option><option>Biarro</option><option>Bordo</option><option>Caenpo</option>
+          <option>Giro</option><option>Havro</option><option>Jisam</option><option>Lyono</option>
+          <option>Manso</option><option>Marseillo</option><option>Nanceo</option><option>Nanto</option>
+          <option>Niceo</option><option>Orlo</option><option>Reimo</option><option>Strabo</option><option>Turo</option>
+        </optgroup>
+        <optgroup label="Générale d'Optique">
+          <option>Chato</option><option>Chemillo</option><option>Cholo</option><option>Dunes</option>
+          <option>Ecume</option><option>Formio</option><option>Marais</option><option>Mudo</option><option>Niorto</option>
+        </optgroup>
+        <optgroup label="Siège">
+          <option>Edgard Développement</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="card">
+      <h2>Que souhaitez-vous mettre à jour ?</h2>
+
+      <label class="cat-toggle">
+        <input type="checkbox" class="cat-check" data-target="cat-coord">
+        <span class="txt"><strong>Coordonnées</strong><span>Adresse, téléphone, e-mail personnel, contact d'urgence</span></span>
+      </label>
+      <div class="cat-body" id="cat-coord">
+        <label>Nouvelle adresse postale</label>
+        <textarea id="coord-adresse" placeholder="N°, rue, code postal, ville"></textarea>
+        <div class="filebox" data-for="coord-justif">
+          <input type="file" id="coord-justif" accept=".pdf,.jpg,.jpeg,.png">
+          <div class="fb-label">📎 Joindre un justificatif de domicile (optionnel)</div>
+          <div class="fb-sub">PDF, JPG ou PNG — 20 Mo max</div>
+        </div>
+        <div class="row2">
+          <div><label>Téléphone personnel</label><input type="tel" id="coord-tel"></div>
+          <div><label>E-mail personnel</label><input type="email" id="coord-email"></div>
+        </div>
+        <div class="row2">
+          <div><label>Contact d'urgence — nom</label><input type="text" id="coord-urgence-nom"></div>
+          <div><label>Contact d'urgence — téléphone</label><input type="tel" id="coord-urgence-tel"></div>
+        </div>
+      </div>
+
+      <label class="cat-toggle">
+        <input type="checkbox" class="cat-check" data-target="cat-rib">
+        <span class="txt"><strong>Coordonnées bancaires</strong><span>Changement de RIB pour le versement du salaire</span></span>
+      </label>
+      <div class="cat-body" id="cat-rib">
+        <p class="hint">Merci de joindre directement une photo ou un scan de votre RIB — nous ne ressaisissons pas l'IBAN à la main pour éviter toute erreur.</p>
+        <div class="filebox" data-for="rib-justif">
+          <input type="file" id="rib-justif" accept=".pdf,.jpg,.jpeg,.png">
+          <div class="fb-label">📎 Joindre mon RIB <span class="required-tag">*</span></div>
+          <div class="fb-sub">PDF, JPG ou PNG — 20 Mo max</div>
+        </div>
+      </div>
+
+      <label class="cat-toggle">
+        <input type="checkbox" class="cat-check" data-target="cat-famille">
+        <span class="txt"><strong>Situation familiale</strong><span>Mariage, Pacs, naissance, divorce, changement de nom</span></span>
+      </label>
+      <div class="cat-body" id="cat-famille">
+        <label>Nature du changement</label>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="famille-type" value="Mariage / Pacs"> Mariage / Pacs</label>
+          <label class="radio-opt"><input type="radio" name="famille-type" value="Naissance d'un enfant"> Naissance d'un enfant</label>
+          <label class="radio-opt"><input type="radio" name="famille-type" value="Divorce / séparation"> Divorce / séparation</label>
+          <label class="radio-opt"><input type="radio" name="famille-type" value="Changement de nom"> Changement de nom</label>
+        </div>
+        <div class="filebox" data-for="famille-justif">
+          <input type="file" id="famille-justif" accept=".pdf,.jpg,.jpeg,.png">
+          <div class="fb-label">📎 Joindre le justificatif <span class="required-tag">*</span></div>
+          <div class="fb-sub">Acte, livret de famille… — PDF, JPG ou PNG, 20 Mo max</div>
+        </div>
+      </div>
+
+      <label class="cat-toggle">
+        <input type="checkbox" class="cat-check" data-target="cat-autre">
+        <span class="txt"><strong>Autre</strong><span>Toute autre demande de mise à jour</span></span>
+      </label>
+      <div class="cat-body" id="cat-autre">
+        <label>Votre demande</label>
+        <textarea id="autre-desc" placeholder="Décrivez votre demande"></textarea>
+        <div class="filebox" data-for="autre-justif">
+          <input type="file" id="autre-justif" accept=".pdf,.jpg,.jpeg,.png">
+          <div class="fb-label">📎 Joindre un fichier (optionnel)</div>
+          <div class="fb-sub">PDF, JPG ou PNG — 20 Mo max</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Commentaire (optionnel)</h2>
+      <textarea id="commentaire" placeholder="Toute précision utile pour le service RH"></textarea>
+    </div>
+
+    <div class="submit-bar">
+      <button type="submit" class="btn" id="btnSubmit">Envoyer ma demande</button>
+      <div class="err" id="errMsg"></div>
+    </div>
+  </form>
+
+  <div class="okbox" id="okBox">
+    <h2>Demande envoyée ✅</h2>
+    <p>Le service RH a bien reçu votre demande et reviendra vers vous si besoin.</p>
+  </div>
+</div>
+
+<script>
+const WEBHOOK_URL = "https://edgard-opticiens.app.n8n.cloud/webhook/maj-informations";
+const MAX_SIZE = 20 * 1024 * 1024; // 20 Mo
+
+document.querySelectorAll('.cat-check').forEach(chk => {
+  chk.addEventListener('change', () => {
+    const target = document.getElementById(chk.dataset.target);
+    target.classList.toggle('show', chk.checked);
+  });
+});
+
+document.querySelectorAll('.filebox').forEach(box => {
+  const input = box.querySelector('input[type=file]');
+  box.addEventListener('click', () => input.click());
+  input.addEventListener('change', () => {
+    if (input.files[0]) {
+      box.classList.add('has-file');
+      box.querySelector('.fb-label').textContent = '✅ ' + input.files[0].name;
+    } else {
+      box.classList.remove('has-file');
+    }
+  });
+});
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+document.getElementById('frm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const err = document.getElementById('errMsg');
+  err.style.display = 'none';
+  const btn = document.getElementById('btnSubmit');
+
+  const nom = document.getElementById('nom').value.trim();
+  const prenom = document.getElementById('prenom').value.trim();
+  const societe = document.getElementById('societe').value;
+  if (!nom || !prenom || !societe) {
+    err.textContent = "Merci de renseigner votre nom, prénom et magasin.";
+    err.style.display = 'block';
+    return;
+  }
+
+  const coordChecked = document.querySelector('[data-target="cat-coord"]').checked;
+  const ribChecked = document.querySelector('[data-target="cat-rib"]').checked;
+  const familleChecked = document.querySelector('[data-target="cat-famille"]').checked;
+  const autreChecked = document.querySelector('[data-target="cat-autre"]').checked;
+
+  if (!coordChecked && !ribChecked && !familleChecked && !autreChecked) {
+    err.textContent = "Merci de cocher au moins une catégorie à mettre à jour.";
+    err.style.display = 'block';
+    return;
+  }
+
+  if (ribChecked && !document.getElementById('rib-justif').files[0]) {
+    err.textContent = "Merci de joindre votre RIB pour un changement de coordonnées bancaires.";
+    err.style.display = 'block';
+    return;
+  }
+  if (familleChecked) {
+    const typeChoisi = document.querySelector('input[name="famille-type"]:checked');
+    if (!typeChoisi) {
+      err.textContent = "Merci de préciser la nature du changement de situation familiale.";
+      err.style.display = 'block';
+      return;
+    }
+    if (!document.getElementById('famille-justif').files[0]) {
+      err.textContent = "Merci de joindre un justificatif pour ce changement de situation familiale.";
+      err.style.display = 'block';
+      return;
+    }
+  }
+
+  const allFileInputs = ['coord-justif','rib-justif','famille-justif','autre-justif'];
+  for (const id of allFileInputs) {
+    const f = document.getElementById(id).files[0];
+    if (f && f.size > MAX_SIZE) {
+      err.textContent = "Le fichier \"" + f.name + "\" dépasse 20 Mo. Merci de le compresser ou d'en choisir un plus léger.";
+      err.style.display = 'block';
+      return;
+    }
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Envoi en cours…";
+
+  try {
+    const categories = {};
+    if (coordChecked) {
+      categories.coordonnees = { active: true, titre: "Coordonnées", champs: {
+        "Nouvelle adresse": document.getElementById('coord-adresse').value.trim(),
+        "Téléphone personnel": document.getElementById('coord-tel').value.trim(),
+        "E-mail personnel": document.getElementById('coord-email').value.trim(),
+        "Contact d'urgence": [document.getElementById('coord-urgence-nom').value.trim(), document.getElementById('coord-urgence-tel').value.trim()].filter(Boolean).join(' — ')
+      }};
+    }
+    if (ribChecked) {
+      categories.rib = { active: true, titre: "Coordonnées bancaires", champs: {} };
+    }
+    if (familleChecked) {
+      const typeChoisi = document.querySelector('input[name="famille-type"]:checked');
+      categories.famille = { active: true, titre: "Situation familiale", champs: {
+        "Nature du changement": typeChoisi ? typeChoisi.value : ''
+      }};
+    }
+    if (autreChecked) {
+      categories.autre = { active: true, titre: "Autre demande", champs: {
+        "Description": document.getElementById('autre-desc').value.trim()
+      }};
+    }
+
+    const fichiers = [];
+    const fileMap = [
+      ['coord-justif', 'Justificatif de domicile'],
+      ['rib-justif', 'RIB'],
+      ['famille-justif', 'Justificatif situation familiale'],
+      ['autre-justif', 'Pièce jointe (autre)']
+    ];
+    for (const [id, label] of fileMap) {
+      const f = document.getElementById(id).files[0];
+      if (f) {
+        const b64 = await fileToBase64(f);
+        fichiers.push({ champ: label, nom_fichier: f.name, contenu_base64: b64, type_mime: f.type || 'application/octet-stream' });
+      }
+    }
+
+    const payload = {
+      nom, prenom, societe,
+      categories,
+      commentaire: document.getElementById('commentaire').value.trim(),
+      date_dossier: new Date().toISOString().slice(0,10),
+      fichiers
+    };
+
+    const res = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
+    document.getElementById('frm').style.display = 'none';
+    document.getElementById('okBox').style.display = 'block';
+  } catch (ex) {
+    err.textContent = "L'envoi n'a pas abouti. Réessayez, ou écrivez directement à ressources-humaines@groupe-edgard.com.";
+    err.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = "Envoyer ma demande";
+  }
+});
+</script>
+</body>
+</html>
