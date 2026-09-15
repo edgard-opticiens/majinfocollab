@@ -66,7 +66,7 @@
 <div class="wrap">
   <p class="eyebrow">Groupe Edgard · Ressources Humaines</p>
   <h1>Mettre à jour mes informations</h1>
-  <p class="subtitle">Signalez un changement (adresse, RIB, situation familiale…) directement au service RH, avec vos justificatifs si besoin. Vous pouvez cocher plusieurs catégories en même temps.</p>
+  <p class="subtitle">Signalez un changement (adresse, RIB, pièce d'identité, situation familiale, photo…) directement au service RH, avec vos justificatifs. Vous pouvez cocher plusieurs catégories en même temps.</p>
 
   <form id="frm">
     <div class="card">
@@ -106,7 +106,7 @@
         <textarea id="coord-adresse" placeholder="N°, rue, code postal, ville"></textarea>
         <div class="filebox" data-for="coord-justif">
           <input type="file" id="coord-justif" accept=".pdf,.jpg,.jpeg,.png">
-          <div class="fb-label">📎 Joindre un justificatif de domicile (optionnel)</div>
+          <div class="fb-label">📎 Joindre un justificatif de domicile <span class="required-tag">*</span></div>
           <div class="fb-sub">PDF, JPG ou PNG — 20 Mo max</div>
         </div>
         <div class="row2">
@@ -124,11 +124,37 @@
         <span class="txt"><strong>Coordonnées bancaires</strong><span>Changement de RIB pour le versement du salaire</span></span>
       </label>
       <div class="cat-body" id="cat-rib">
-        <p class="hint">Merci de joindre directement une photo ou un scan de votre RIB — nous ne ressaisissons pas l'IBAN à la main pour éviter toute erreur.</p>
+        <p class="hint">Merci de fournir un RIB bancaire au format PDF.</p>
         <div class="filebox" data-for="rib-justif">
-          <input type="file" id="rib-justif" accept=".pdf,.jpg,.jpeg,.png">
-          <div class="fb-label">📎 Joindre mon RIB <span class="required-tag">*</span></div>
+          <input type="file" id="rib-justif" accept=".pdf">
+          <div class="fb-label">📎 Joindre mon RIB (PDF) <span class="required-tag">*</span></div>
+          <div class="fb-sub">Format PDF — 20 Mo max</div>
+        </div>
+      </div>
+
+      <label class="cat-toggle">
+        <input type="checkbox" class="cat-check" data-target="cat-identite">
+        <span class="txt"><strong>Pièce d'identité</strong><span>Nouvelle CNI ou nouveau passeport</span></span>
+      </label>
+      <div class="cat-body" id="cat-identite">
+        <p class="hint">Carte nationale d'identité ou passeport, recto (et verso pour la CNI).</p>
+        <div class="filebox" data-for="identite-justif">
+          <input type="file" id="identite-justif" accept=".pdf,.jpg,.jpeg,.png">
+          <div class="fb-label">📎 Joindre ma pièce d'identité <span class="required-tag">*</span></div>
           <div class="fb-sub">PDF, JPG ou PNG — 20 Mo max</div>
+        </div>
+      </div>
+
+      <label class="cat-toggle">
+        <input type="checkbox" class="cat-check" data-target="cat-photo">
+        <span class="txt"><strong>Photo</strong><span>Mettre à jour ma photo (trombinoscope)</span></span>
+      </label>
+      <div class="cat-body" id="cat-photo">
+        <p class="hint">Photo de type portrait, visage dégagé et bien reconnaissable.</p>
+        <div class="filebox" data-for="photo-justif">
+          <input type="file" id="photo-justif" accept=".jpg,.jpeg,.png">
+          <div class="fb-label">📎 Joindre ma nouvelle photo <span class="required-tag">*</span></div>
+          <div class="fb-sub">JPG ou PNG — 20 Mo max</div>
         </div>
       </div>
 
@@ -233,20 +259,33 @@ document.getElementById('frm').addEventListener('submit', async (e) => {
 
   const coordChecked = document.querySelector('[data-target="cat-coord"]').checked;
   const ribChecked = document.querySelector('[data-target="cat-rib"]').checked;
+  const identiteChecked = document.querySelector('[data-target="cat-identite"]').checked;
+  const photoChecked = document.querySelector('[data-target="cat-photo"]').checked;
   const familleChecked = document.querySelector('[data-target="cat-famille"]').checked;
   const autreChecked = document.querySelector('[data-target="cat-autre"]').checked;
 
-  if (!coordChecked && !ribChecked && !familleChecked && !autreChecked) {
+  if (!coordChecked && !ribChecked && !identiteChecked && !photoChecked && !familleChecked && !autreChecked) {
     err.textContent = "Merci de cocher au moins une catégorie à mettre à jour.";
     err.style.display = 'block';
     return;
   }
 
-  if (ribChecked && !document.getElementById('rib-justif').files[0]) {
-    err.textContent = "Merci de joindre votre RIB pour un changement de coordonnées bancaires.";
-    err.style.display = 'block';
-    return;
+  // Une pièce jointe est obligatoire pour toutes les catégories, sauf "Autre"
+  const categoriesAvecPJObligatoire = [
+    { active: coordChecked, id: 'coord-justif', message: "Merci de joindre un justificatif de domicile." },
+    { active: ribChecked, id: 'rib-justif', message: "Merci de joindre votre RIB pour un changement de coordonnées bancaires." },
+    { active: identiteChecked, id: 'identite-justif', message: "Merci de joindre votre pièce d'identité." },
+    { active: photoChecked, id: 'photo-justif', message: "Merci de joindre votre nouvelle photo." },
+    { active: familleChecked, id: 'famille-justif', message: "Merci de joindre un justificatif pour ce changement de situation familiale." },
+  ];
+  for (const c of categoriesAvecPJObligatoire) {
+    if (c.active && !document.getElementById(c.id).files[0]) {
+      err.textContent = c.message;
+      err.style.display = 'block';
+      return;
+    }
   }
+
   if (familleChecked) {
     const typeChoisi = document.querySelector('input[name="famille-type"]:checked');
     if (!typeChoisi) {
@@ -254,14 +293,9 @@ document.getElementById('frm').addEventListener('submit', async (e) => {
       err.style.display = 'block';
       return;
     }
-    if (!document.getElementById('famille-justif').files[0]) {
-      err.textContent = "Merci de joindre un justificatif pour ce changement de situation familiale.";
-      err.style.display = 'block';
-      return;
-    }
   }
 
-  const allFileInputs = ['coord-justif','rib-justif','famille-justif','autre-justif'];
+  const allFileInputs = ['coord-justif','rib-justif','identite-justif','photo-justif','famille-justif','autre-justif'];
   for (const id of allFileInputs) {
     const f = document.getElementById(id).files[0];
     if (f && f.size > MAX_SIZE) {
@@ -287,6 +321,12 @@ document.getElementById('frm').addEventListener('submit', async (e) => {
     if (ribChecked) {
       categories.rib = { active: true, titre: "Coordonnées bancaires", champs: {} };
     }
+    if (identiteChecked) {
+      categories.identite = { active: true, titre: "Pièce d'identité", champs: {} };
+    }
+    if (photoChecked) {
+      categories.photo = { active: true, titre: "Photo", champs: {} };
+    }
     if (familleChecked) {
       const typeChoisi = document.querySelector('input[name="famille-type"]:checked');
       categories.famille = { active: true, titre: "Situation familiale", champs: {
@@ -303,6 +343,8 @@ document.getElementById('frm').addEventListener('submit', async (e) => {
     const fileMap = [
       ['coord-justif', 'Justificatif de domicile'],
       ['rib-justif', 'RIB'],
+      ['identite-justif', "Pièce d'identité"],
+      ['photo-justif', 'Nouvelle photo'],
       ['famille-justif', 'Justificatif situation familiale'],
       ['autre-justif', 'Pièce jointe (autre)']
     ];
