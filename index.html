@@ -66,7 +66,7 @@
 <div class="wrap">
   <p class="eyebrow">Groupe Edgard · Ressources Humaines</p>
   <h1>Mettre à jour mes informations</h1>
-  <p class="subtitle">Signalez un changement (adresse, RIB, pièce d'identité, situation familiale, photo…) directement au service RH, avec vos justificatifs. Vous pouvez cocher plusieurs catégories en même temps.</p>
+  <p class="subtitle">Signalez un changement (adresse, RIB, pièce d'identité, situation familiale, mutuelle, photo…) directement au service RH, avec vos justificatifs. Vous pouvez cocher plusieurs catégories en même temps.</p>
 
   <form id="frm">
     <div class="card">
@@ -178,6 +178,16 @@
       </div>
 
       <label class="cat-toggle">
+        <input type="checkbox" class="cat-check" data-target="cat-mutuelle">
+        <span class="txt"><strong>Mutuelle</strong><span>Modifier mes garanties de complémentaire santé</span></span>
+      </label>
+      <div class="cat-body" id="cat-mutuelle">
+        <p class="hint">Je veux changer mes garanties.</p>
+        <label>Garanties souhaitées</label>
+        <textarea id="mutuelle-garanties" placeholder="Précisez les garanties que vous souhaitez (niveau de couverture, options, ayants droit à ajouter…)"></textarea>
+      </div>
+
+      <label class="cat-toggle">
         <input type="checkbox" class="cat-check" data-target="cat-autre">
         <span class="txt"><strong>Autre</strong><span>Toute autre demande de mise à jour</span></span>
       </label>
@@ -262,9 +272,10 @@ document.getElementById('frm').addEventListener('submit', async (e) => {
   const identiteChecked = document.querySelector('[data-target="cat-identite"]').checked;
   const photoChecked = document.querySelector('[data-target="cat-photo"]').checked;
   const familleChecked = document.querySelector('[data-target="cat-famille"]').checked;
+  const mutuelleChecked = document.querySelector('[data-target="cat-mutuelle"]').checked;
   const autreChecked = document.querySelector('[data-target="cat-autre"]').checked;
 
-  if (!coordChecked && !ribChecked && !identiteChecked && !photoChecked && !familleChecked && !autreChecked) {
+  if (!coordChecked && !ribChecked && !identiteChecked && !photoChecked && !familleChecked && !mutuelleChecked && !autreChecked) {
     err.textContent = "Merci de cocher au moins une catégorie à mettre à jour.";
     err.style.display = 'block';
     return;
@@ -293,6 +304,12 @@ document.getElementById('frm').addEventListener('submit', async (e) => {
       err.style.display = 'block';
       return;
     }
+  }
+
+  if (mutuelleChecked && !document.getElementById('mutuelle-garanties').value.trim()) {
+    err.textContent = "Merci de préciser les garanties souhaitées pour votre mutuelle.";
+    err.style.display = 'block';
+    return;
   }
 
   const allFileInputs = ['coord-justif','rib-justif','identite-justif','photo-justif','famille-justif','autre-justif'];
@@ -331,6 +348,12 @@ document.getElementById('frm').addEventListener('submit', async (e) => {
       const typeChoisi = document.querySelector('input[name="famille-type"]:checked');
       categories.famille = { active: true, titre: "Situation familiale", champs: {
         "Nature du changement": typeChoisi ? typeChoisi.value : ''
+      }};
+    }
+    if (mutuelleChecked) {
+      categories.mutuelle = { active: true, titre: "Mutuelle", champs: {
+        "Demande": "Je veux changer mes garanties",
+        "Garanties souhaitées": document.getElementById('mutuelle-garanties').value.trim()
       }};
     }
     if (autreChecked) {
